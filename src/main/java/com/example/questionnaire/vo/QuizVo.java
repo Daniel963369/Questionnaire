@@ -5,10 +5,12 @@ import java.util.List;
 
 import com.example.questionnaire.entity.Question;
 import com.example.questionnaire.entity.Questionnaire;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class QuizVo {
 	private Questionnaire questionnaire  = new Questionnaire();
 	
+	@JsonProperty("question_list")
 	private List<Question> questionList = new ArrayList<>();
 
 	public QuizVo() {

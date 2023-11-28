@@ -46,12 +46,24 @@ public class Questionnaire {
 		this.startDate = startDate;
 		this.endDate = endDate;
 	}
+	
+	
+
+	public Questionnaire(int id, String title, String description, boolean published, LocalDate startDate,
+			LocalDate endDate) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.description = description;
+		this.published = published;
+		this.startDate = startDate;
+		this.endDate = endDate;
+	}
 
 	public int getId() {
 		return id;
 	}
 
-	
 
 	public String getTitle() {
 		return title;
@@ -92,6 +104,7 @@ public class Questionnaire {
 	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
+
 	
 	
 	

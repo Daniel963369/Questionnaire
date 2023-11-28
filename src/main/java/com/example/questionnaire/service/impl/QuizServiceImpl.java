@@ -6,9 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -21,6 +23,7 @@ import com.example.questionnaire.service.ifs.QuizService;
 import com.example.questionnaire.vo.QuizReq;
 import com.example.questionnaire.vo.QuizRes;
 import com.example.questionnaire.vo.QuizVo;
+import com.example.questionnaire.vo.QnQuVo;
 import com.example.questionnaire.vo.QuestionRes;
 import com.example.questionnaire.vo.QuestionnaireRes;
 
@@ -41,14 +44,14 @@ public class QuizServiceImpl implements QuizService{
 		if( checkResult != null) {
 			return checkResult;
 		}
-		int quid = questionnaireDao.save(req.getQuestionnaire()).getId();
+		int quId = questionnaireDao.save(req.getQuestionnaire()).getId();
 //		questionnaireDao.save(req.getQuestionnaire());
 //		List<Question> quList = req.getQuestionList();
 		if (quList.isEmpty()) {
 			return new QuizRes(RtnCode.SUCCESSFUL);
 		}
 		for(Question qu: quList) {
-			qu.setQnId(quid);
+			qu.setQnId(quId);
 		}
 		
 		questionDao.saveAll(quList);
@@ -67,9 +70,9 @@ public class QuizServiceImpl implements QuizService{
 		
 		List<Question> quList = req.getQuestionList();
 		for(Question qu:quList) {
-			if(qu.getQuid() <= 0 || !StringUtils.hasText(qu.getqTitle()) 
-					|| !StringUtils.hasText(qu.getOptionType())) {
-				return new QuizRes(RtnCode.QUESTIONNAIRE_ID_PARAM_ERROR);
+			if(qu.getQuId() <= 0 || !StringUtils.hasText(qu.getqTitle()) 
+					|| !StringUtils.hasText(qu.getOptionType()) || !StringUtils.hasText(qu.getOption())) {
+				return new QuizRes(RtnCode.QUESTION_PARAM_ERROR);
 			}
 		}
 		return null;
@@ -119,15 +122,17 @@ public class QuizServiceImpl implements QuizService{
 		}
 		return null;
 	}
-
+	
+	@Transactional
 	@Override
 	public QuizRes deleteQustionnaire(List<Integer> qnIdList) {
 		List<Questionnaire> qnList = questionnaireDao.findByIdIn(qnIdList);
 		List<Integer> idList = new ArrayList<>();
 		for( Questionnaire qn :qnList) {
-			if(qn.isPublished() == false || qn.isPublished()== true && LocalDate.now().isBefore(qn.getStartDate())) {
+			if(!qn.isPublished() || qn.isPublished() && LocalDate.now().isBefore(qn.getStartDate())) {
 //				questionnaireDao.deleteById(qn.getId());
 				idList.add(qn.getId());
+				
 			}
 		}
 		if(!idList.isEmpty()) {
@@ -136,37 +141,42 @@ public class QuizServiceImpl implements QuizService{
 		}
 		return new QuizRes(RtnCode.SUCCESSFUL);
 	}
-
+	
+	@Transactional
 	@Override
 	public QuizRes deleteQustion(int qnId, List<Integer> quIdList) {
 	Optional<Questionnaire> qnOp = questionnaireDao.findById(qnId);
 	if(qnOp.isEmpty()) {
-		return new QuizRes(RtnCode.SUCCESSFUL);
+		return new QuizRes(RtnCode.QUESTIONNAIRE_ID_NOT_FOUND);
 	}
 	Questionnaire qn = qnOp.get();
-	if(qn.isPublished() == false || qn.isPublished()== true && LocalDate.now().isBefore(qn.getStartDate())) {
+	if(!qn.isPublished() || qn.isPublished() && LocalDate.now().isBefore(qn.getStartDate())) {
 		
 		questionDao.deleteAllByQnIdAndQuIdIn(qnId, quIdList);
 	}
 	
 	return new QuizRes(RtnCode.SUCCESSFUL);
 	}
-
+	
+	@Cacheable(cacheNames = "search",
+			//key = "test_2023-11-25_2023-11-30"
+			key = "#title.concat('_').concat(#startDate.toString()).concat('_').concat(#endDate.toString())",
+			unless = "#result.rtnCode.code != 200")
 	@Override
 	public QuizRes search(String title, LocalDate startDate, LocalDate endDate) {
-//		title = StringUtils.hasText(title)? title:"";
-//		startDate =startDate != null ? startDate:LocalDate.of(1971,1,1);
-//		endDate = endDate != null? endDate: LocalDate.of(2099,12,31);
-		if(!StringUtils.hasText(title)) {
-			title = "";
-		}
-		if(startDate == null) {
-			startDate = LocalDate.of(1971,1,1);
-			
-		}
-		if(endDate == null) {
-			endDate = LocalDate.of(2099,12,31);
-		}
+		title = StringUtils.hasText(title)? title:"";
+		startDate =startDate != null ? startDate:LocalDate.of(1971,1,1);
+		endDate = endDate != null? endDate: LocalDate.of(2099,12,31);
+//		if(!StringUtils.hasText(title)) {
+//			title = "";
+//		}
+//		if(startDate == null) {
+//			startDate = LocalDate.of(1971,1,1);
+//			
+//		}
+//		if(endDate == null) {
+//			endDate = LocalDate.of(2099,12,31);
+//		}
 		List<Questionnaire> qnList = questionnaireDao.findByTitleContainingAndStartDateGreaterThanEqualAndEndDateLessThanEqual(title, startDate, endDate);
 		List<Integer> qnIdList = new ArrayList<>();
 		for(Questionnaire qu:qnList) {
@@ -188,17 +198,18 @@ public class QuizServiceImpl implements QuizService{
 		vo.setQuestionList(questionList);
 		quizVoList.add(vo);
 	}
-	return new QuizRes(RtnCode.SUCCESSFUL);
+	return new QuizRes(quizVoList,RtnCode.SUCCESSFUL);
 	}
 
 	@Override
 	public QuestionnaireRes searchQuestionnaireList(String title, LocalDate startDate, LocalDate endDate,boolean isAll) {
 		title = StringUtils.hasText(title)? title:"";
-		startDate =startDate != null ? startDate:LocalDate.of(1971,1,1);
-		endDate = endDate != null? endDate: LocalDate.of(2099,12,31);
+		startDate =startDate == null ? LocalDate.of(1971,1,1):startDate;
+		endDate = endDate == null? LocalDate.of(2099,12,31):endDate;
 		List<Questionnaire> qnList = new ArrayList<>();
 		if(!isAll) {
 			 qnList = questionnaireDao.findByTitleContainingAndStartDateGreaterThanEqualAndEndDateLessThanEqualAndPublishedTrue(title, startDate, endDate);
+			 
 		}else {
 			qnList = questionnaireDao.findByTitleContainingAndStartDateGreaterThanEqualAndEndDateLessThanEqual(title, startDate, endDate);
 		}
@@ -214,4 +225,6 @@ public class QuizServiceImpl implements QuizService{
 		List<Question> quList = questionDao.findAllByQnIdIn(new ArrayList<>(Arrays.asList(qnId)));
 		return new QuestionRes(quList,RtnCode.SUCCESSFUL);
 	}
+
+
 }
