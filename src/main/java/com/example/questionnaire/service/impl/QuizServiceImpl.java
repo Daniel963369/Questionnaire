@@ -10,6 +10,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -162,6 +163,7 @@ public class QuizServiceImpl implements QuizService{
 			//key = "test_2023-11-25_2023-11-30"
 			key = "#title.concat('_').concat(#startDate.toString()).concat('_').concat(#endDate.toString())",
 			unless = "#result.rtnCode.code != 200")
+	@CacheEvict(cacheNames = "search",allEntries = true)//刪前端暫存區域的方法 或是將cacheable註解掉也行
 	@Override
 	public QuizRes search(String title, LocalDate startDate, LocalDate endDate) {
 		title = StringUtils.hasText(title)? title:"";
