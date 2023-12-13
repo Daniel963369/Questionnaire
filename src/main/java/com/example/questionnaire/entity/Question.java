@@ -10,33 +10,31 @@ import javax.persistence.Table;
 @Table(name = "question")
 @IdClass(value = QuestionId.class)
 public class Question {
-	
+
 	@Id
-	@Column (name = "id")
+	@Column(name = "id")
 	private int quId;
-	
+
 	@Id
-	@Column (name = "q_id")
+	@Column(name = "q_id")
 	private int qnId;
-	
+
 	@Column(name = "q_title")
 	private String qTitle;
-	
+
 	@Column(name = "option_type")
 	private String optionType;
-	
-	@Column (name = "is_necessary")
+
+	@Column(name = "is_necessary")
 	private boolean necessary;
-	
+
 	@Column(name = "q_option")
 	private String option;
 
 	public Question() {
 		super();
-			
+
 	}
-
-
 
 	public Question(int quId, int qnId, String qTitle, String optionType, boolean necessary, String option) {
 		super();
@@ -48,8 +46,6 @@ public class Question {
 		this.option = option;
 	}
 
-
-
 	public Question(int quId, String qTitle, String optionType, boolean necessary, String option) {
 		super();
 		this.quId = quId;
@@ -59,13 +55,11 @@ public class Question {
 		this.option = option;
 	}
 
-
-
-	public int getQuid() {
+	public int getQuId() {
 		return quId;
 	}
 
-	public void setQuid(int quId) {
+	public void setQuId(int quId) {
 		this.quId = quId;
 	}
 
@@ -111,5 +105,7 @@ public class Question {
 
 	
 	
+
 	
+
 }

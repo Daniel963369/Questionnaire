@@ -3,8 +3,11 @@ package com.example.questionnaire.vo;
 import java.util.List;
 
 import com.example.questionnaire.constants.RtnCode;
+import com.example.questionnaire.entity.User;
 
 public class QuizRes {
+	
+
 	
 	private RtnCode rtnCode;
 	
@@ -30,6 +33,11 @@ public class QuizRes {
 		this.quizVoList = quizVoList;
 		this.rtnCode = rtnCode;
 	}
+	
+	
+
+
+
 
 
 
@@ -52,8 +60,7 @@ public class QuizRes {
 	public void setQuizVoList(List<QuizVo> quizVoList) {
 		this.quizVoList = quizVoList;
 	}
-	
-	
-	
+
+
 	
 }
