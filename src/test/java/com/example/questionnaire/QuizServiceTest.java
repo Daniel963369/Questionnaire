@@ -116,5 +116,25 @@ public class QuizServiceTest {
 		System.out.println(res);
 	}
 	
+<<<<<<< HEAD
+=======
+	@Test
+	public void limitTest() {
+		List<Questionnaire>res = questionnaireDao.findWithLimitAndStartPosition(0,3);
+		for(Questionnaire item:res) {
+			System.out.println(item.getId());
+		}
+		res.forEach(item ->{
+			System.out.println(item.getId());
+		});
+	}
+	
+	@Test
+	public void likeTest() {
+		List<Questionnaire>res = questionnaireDao.searchTitleLike("test");
+		System.out.println(res.size());
+	}
+	
+>>>>>>> 10910a2beb2375331612868bc75e426d9689010e
 	
 	}

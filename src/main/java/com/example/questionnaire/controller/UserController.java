@@ -1,5 +1,6 @@
 package com.example.questionnaire.controller;
 
+<<<<<<< HEAD
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,4 +34,8 @@ public class UserController {
 		
 	}
 	
+=======
+public class UserController {
+
+>>>>>>> 10910a2beb2375331612868bc75e426d9689010e
 }

@@ -13,8 +13,11 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+<<<<<<< HEAD
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+=======
+>>>>>>> 10910a2beb2375331612868bc75e426d9689010e
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -27,6 +30,7 @@ import com.example.questionnaire.service.ifs.QuizService;
 import com.example.questionnaire.vo.QuizReq;
 import com.example.questionnaire.vo.QuizRes;
 import com.example.questionnaire.vo.QuizVo;
+import com.example.questionnaire.vo.QnQuVo;
 import com.example.questionnaire.vo.QuestionRes;
 import com.example.questionnaire.vo.QuestionnaireRes;
 
@@ -180,11 +184,19 @@ public class QuizServiceImpl implements QuizService{
 	return new QuizRes(RtnCode.SUCCESSFUL);
 	}
 	
+<<<<<<< HEAD
 //	@Cacheable(cacheNames = "search",
 //			//key = "test_2023-11-25_2023-11-30"
 //			key = "#title.concat('_').concat(#startDate.toString()).concat('_').concat(#endDate.toString())",
 //			unless = "#result.rtnCode.code != 200")
 //	@CacheEvict(cacheNames = "deleteQuestionnaire", allEntries = true)//清除緩存
+=======
+	@Cacheable(cacheNames = "search",
+			//key = "test_2023-11-25_2023-11-30"
+			key = "#title.concat('_').concat(#startDate.toString()).concat('_').concat(#endDate.toString())",
+			unless = "#result.rtnCode.code != 200")
+	@CacheEvict(cacheNames = "search",allEntries = true)//刪前端暫存區域的方法 或是將cacheable註解掉也行
+>>>>>>> 10910a2beb2375331612868bc75e426d9689010e
 	@Override
 	public QuizRes search(String title, LocalDate startDate, LocalDate endDate) {
 		title = StringUtils.hasText(title)? title:"";
@@ -248,6 +260,7 @@ public class QuizServiceImpl implements QuizService{
 		List<Question> quList = questionDao.findAllByQnIdIn(new ArrayList<>(Arrays.asList(qnId)));
 		return new QuestionRes(quList,RtnCode.SUCCESSFUL);
 	}
+<<<<<<< HEAD
 	
 	
 //	@Scheduled(cron = "0/5 * 15 * * * ")
@@ -264,4 +277,8 @@ public class QuizServiceImpl implements QuizService{
 //	}
 	
 	
+=======
+
+
+>>>>>>> 10910a2beb2375331612868bc75e426d9689010e
 }

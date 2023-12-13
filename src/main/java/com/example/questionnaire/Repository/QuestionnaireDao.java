@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.questionnaire.entity.Questionnaire;
+import com.example.questionnaire.vo.QnQuVo;
 
 @Repository
 public interface QuestionnaireDao extends JpaRepository<Questionnaire, Integer> {
@@ -64,5 +65,33 @@ public interface QuestionnaireDao extends JpaRepository<Questionnaire, Integer> 
 			@Param ("title")String title,
 			@Param ("desp") String description,
 			@Param ("startDate") LocalDate startDate);
+<<<<<<< HEAD
+=======
+	
+	@Query(value = "select * from questionnaire " 
+			 + "limit :startIndex, :limitNum",nativeQuery = true)
+	public List<Questionnaire>findWithLimitAndStartPosition(
+			@Param("startIndex")int startIndex,
+			@Param("limitNum")int limitNum);
+			
+	@Query(value = "select * from questionnaire "
+			+ " where title like %:title%", nativeQuery = true)
+	public List<Questionnaire> searchTitleLike(@Param ("title")String title);
+	
+	@Query(value = "select * from questionnaire "
+			 + "where title regexp :keyWord1 | :keyWord2",nativeQuery = true)
+	public List<Questionnaire> searchDescriptionContaining(@Param("keyWord1")String keyWord1,
+			@Param("keyWord2")String keyWord2);
+	
+//相等於78-81行
+//	@Query(value = "select * from questionnaire "
+//			 + "where title regexp concat(:keyWord1, '|', :keyWord2"),nativeQuery = true)
+//	public List<Questionnaire> searchDescriptionContaining(@Param("keyWord1")String keyWord1,
+//			@Param("keyWord2")String keyWord2);
+	
+	
+
+			
+>>>>>>> 10910a2beb2375331612868bc75e426d9689010e
 			
 }
